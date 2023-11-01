@@ -1,17 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import axios from 'axios'
+import { useSearchParams } from "react-router-dom";
 
 
 
 export const ProductPage = () => {
-
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [page,setPage]=useState(1);
+    const [sort,setSort]=useState()
     const [data,setData]=useState([])
 
+ 
+const cat=searchParams.get('category')
+console.log(cat)
+var url=`http://localhost:8080`
     useEffect(()=>{
+        
      (async()=>{
+    if(cat!==""){
+        url+=`?category=${cat}`
+    }
+   
         try {
-           await axios.get(`http://localhost:8080?sortby=price&category=Men&order=asc&limit=6&pageNo=1`).then(({data})=>{
+           await axios.get(url).then(({data})=>{
                 console.log(data.data)
                 setData(data.data)
             })
@@ -19,8 +31,10 @@ export const ProductPage = () => {
             
         }
      })()
-    },[])
+    },[page,sort,cat])
 
+   
+   
     return (
         <Container >
 
@@ -29,11 +43,13 @@ export const ProductPage = () => {
 
                 <div>
                     <Heading > Filter By Categories</Heading>
-                    <OptionDiv>
-                        <label htmlFor=""> <input type='checkbox' /> All</label>
-                        <label htmlFor=""> <input type='checkbox' /> Mens</label>
-                        <label htmlFor=""> <input type='checkbox' /> Womens</label>
-                        <label htmlFor=""> <input type='checkbox' /> Kids</label>
+                    <OptionDiv onChange={(e)=>setSearchParams({
+                        category:e.target.value
+                    })} >
+                        <label htmlFor=""> <input type='checkbox' value="" /> All</label>
+                        <label htmlFor=""> <input type='checkbox' value="Men" /> Mens</label>
+                        <label htmlFor=""> <input type='checkbox' value="Women" /> Womens</label>
+                        <label htmlFor=""> <input type='checkbox' value="Kids" /> Kids</label>
                     </OptionDiv>
 
                 </div>
@@ -90,17 +106,17 @@ export const ProductPage = () => {
 
             </FilterOptions>
 
-         <div>
+         <ProductContainer> 
             <div style={{
             // border:'1px solid',
             textAlign:'start'
          }}>
-            <select style={{padding:'10px',color:'gray',border:'none',outline:'none',boxShadow: 'rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px'}} name="" id="">
-                <option value="">Select Here For Sort</option>
-                <option value="">Sort By Latest</option>
-                <option value="">Sort By Poplular</option>
-                <option value="">Sort By Price : Low To High</option>
-                <option value="">Sort By Price : High To Low</option>
+            <select onChange={(e)=>setSort(e.target.value)} style={{padding:'10px',color:'gray',border:'none',outline:'none',boxShadow: 'rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px'}} name="" id="">
+                <option value="undefined">Select Here For Sort</option>
+                {/* <option value="">Sort By Latest</option>
+                <option value="">Sort By Poplular</option> */}
+                <option value="asc">Sort By Price : Low To High</option>
+                <option value="desc">Sort By Price : High To Low</option>
             </select>
           
             </div>
@@ -108,14 +124,14 @@ export const ProductPage = () => {
                 display:'grid',
                 gridTemplateColumns:'repeat(3,1fr)',
                 width:'100%',
-               
+               border:'1px solid',
                 gap:'30px 20px',
                 marginTop:'20px'
                
             }}>
                 {data.map((elem,ind)=>{
                     return (
-                        <div style={{
+                        <div key={ind} style={{
                         borderRadius:'5px',
                          boxShadow: 'rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px'
                         }}>
@@ -150,14 +166,7 @@ export const ProductPage = () => {
                                     
                                 </div>
                                 <Rating rating={elem.rating} />
-                              <button style={{
-                                padding:'5px',
-                                backgroundColor:'#FF324D',
-                                color:'white',
-                                border:'none',
-                                fontWeight:'700',
-                                borderRadius:'5px'
-                              }}>Add To Cart</button>
+                              <Addtocart >Add To Cart</Addtocart>
                             </div>
                         </div>
                     )
@@ -168,11 +177,11 @@ export const ProductPage = () => {
     
                     margin:"10% auto"
                 }}>
-                <PageButtons>prev</PageButtons>&nbsp;&nbsp;
-                <PageButtons>1</PageButtons>&nbsp;&nbsp;
-                <PageButtons>next</PageButtons>
+                <PageButtons onClick={()=>(setPage((p)=>p-1))} >prev</PageButtons>&nbsp;&nbsp;
+                <PageButtons>{page}</PageButtons>&nbsp;&nbsp;
+                <PageButtons  onClick={()=>(setPage((p)=>p+1))}>next</PageButtons>
             </div>
-         </div>
+         </ProductContainer>
             
         </Container>
     )
@@ -198,12 +207,29 @@ const Rating = ({ rating }) => {
     return <div>{stars}</div>;
   };
 
+
+  const ProductContainer=styled.div`
+  width:75%;
+  `
+const Addtocart=styled.button`
+
+    padding:5px;
+    background-color:#FF324D;
+    color:white;
+    border:none;
+    font-weight:700;
+    border-radius:5px
+
+`
+
   const PageButtons=styled.button`
   padding:10px;
-  background-color:#FF324D;
+  background-color: ${props => props.disabled ? 'gray' : '#FF324D'};
+
   color:white;
   border:none;
-  border-radius:5px
+  border-radius:5px;
+  
 
   `
 const Container = styled.div`
@@ -216,7 +242,7 @@ const Container = styled.div`
 `
 const FilterOptions = styled.div`
     ;
-    width:30%;
+    width:25%;
     text-align:start;
   
 `
