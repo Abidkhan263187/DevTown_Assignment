@@ -43,16 +43,19 @@ export default Navbar;
 // Create styled components for the navbar elements
 const NavbarContainer1 = styled.nav`
   background-color: white;
- 
+
   display: flex;
   justify-content: space-between;
   padding: 5px 100px;
   margin:auto;
   // position:fixed;
   width:100%;
-  
- 
-
+  @media(max-width:767px){
+    display:none
+  }
+  @media (min-width:768px) and  (max-width:1023px){
+    display:none
+  }
 `;
 
 const NavbarContainer2 = styled.nav`
@@ -62,6 +65,12 @@ const NavbarContainer2 = styled.nav`
     justify-content: space-between;
     padding: 10px 100px;
     border-bottom:1px solid #EFEBEC;
+    @media(max-width:767px){
+      display:none
+    }
+    @media (min-width:768px) and  (max-width:1023px){
+      display:none
+    }
 }
 `
 
@@ -89,3 +98,4 @@ const NavItem = styled.p`
 const Image = styled.img`
 width:200px
 `
+

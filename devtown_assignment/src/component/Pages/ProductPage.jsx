@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import styled from 'styled-components'
+import styled, {css} from 'styled-components'
 import axios from 'axios'
 import { useSearchParams } from "react-router-dom";
+import { Rating } from './Rating';
+import { Filter } from './Filter';
 
 
 
@@ -14,212 +16,167 @@ export const ProductPage = () => {
 
     const cat = searchParams.get('category')
     const sort = searchParams.get('sortby')
+    const size = searchParams.get('size')
+    const rat = searchParams.get('rating')
+    // console.log(cat)
     var url = `http://localhost:8080`
     useEffect(() => {
-
         (async () => {
-            if (cat !== "" && cat !== null) {
-                url += `?category=${cat}&pageNo=${page}`;
-            }
-            if (sort !== "" && sort !== null) {
-                url += cat !== "" ? `&sortby=price&order=${sort}&pageNo=${page}`
-                    : `?sortby=price&order=${sort}&pageNo=${page}`;
-            }
-            console.log(url)
+            let queryParams = [];
 
+            if (cat) queryParams.push(`category=${cat}`);
+            if (sort) queryParams.push(`sortby=price&order=${sort}`);
+            if (size) queryParams.push(`size=${size}`);
+            if (rat) queryParams.push(`rating=${rat}`);
+
+            const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}&pageNo=${page}` : `?pageNo=${page}`;
             try {
-                await axios.get(url).then(({ data }) => {
-                    // console.log(data.data)
-                    setData(data.data)
-                })
+                const response = await axios.get(url + queryString);
+                const { data } = response;
+                setData(data.data);
             } catch (error) {
-
+                console.log(error)
             }
-        })()
-    }, [page, sort, cat])
+        })();
+    }, [page, sort, cat, size, rat]);
+
 
 
 
     return (
         <Container >
-
-            {/* filter option */}
-            <FilterOptions >
-
-                <div>
-                    <Heading > Filter By Categories</Heading>
-                    <OptionDiv onChange={(e) => {
-                        searchParams.set('category', e.target.value)
-                        setSearchParams(searchParams)
-                    }} >
-                        <label htmlFor=""> <input type='checkbox' value="" /> All</label>
-                        <label htmlFor=""> <input type='checkbox' value="Men" /> Mens</label>
-                        <label htmlFor=""> <input type='checkbox' value="Women" /> Womens</label>
-                        <label htmlFor=""> <input type='checkbox' value="Kids" /> Kids</label>
-                    </OptionDiv>
-
-                </div>
-
-                <div>
-                    <Heading> Filter By Size</Heading>
-                    <OptionDiv >
-                        <label htmlFor=""> <input type='checkbox' /> M</label>
-                        <label htmlFor=""> <input type='checkbox' /> S</label>
-                        <label htmlFor=""> <input type='checkbox' /> L</label>
-                        <label htmlFor=""> <input type='checkbox' /> XL</label>
-                        <label htmlFor=""> <input type='checkbox' /> XXL</label>
-                        <label htmlFor=""> <input type='checkbox' /> XXXL</label>
-                    </OptionDiv>
-                </div>
-                <div>
-                    <Heading> Filter By Rating</Heading>
-                    <OptionDiv >
-                        <label htmlFor="" style={{ display: 'flex' }}> <input type='checkbox' />&nbsp; <Rating rating='1' /></label>
-                        <label htmlFor="" style={{ display: 'flex' }}> <input type='checkbox' />&nbsp; <Rating rating='2' /></label>
-                        <label htmlFor="" style={{ display: 'flex' }}> <input type='checkbox' />&nbsp; <Rating rating='3' /></label>
-                        <label htmlFor="" style={{ display: 'flex' }}> <input type='checkbox' />&nbsp; <Rating rating='4' /></label>
-                        <label htmlFor="" style={{ display: 'flex' }}> <input type='checkbox' />&nbsp; <Rating rating='5' /></label>
-                    </OptionDiv>
-                </div>
-                <div>
-                    <Heading> Product Status</Heading>
-                    <OptionDiv >
-                        <label htmlFor=""> <input type='checkbox' /> In Stock </label>
-                        <label htmlFor=""> <input type='checkbox' /> On Sale </label>
-                    </OptionDiv>
-                </div>
-                <div style={{
-                    backgroundImage: 'url(https://klbtheme.com/shopwise/fashion/wp-content/uploads/2020/04/sidebar_banner_img-1.jpg)',
-                    height: '350px',
-                    color: 'white',
-                    marginTop: '30px'
-
-
-                }}>
-                    <div style={{
-                        padding: '70% 0px 0px 20px',
-                        height: 'max-content'
-                    }}>
-                        <h3>New Collection</h3>
-                        <h1>Sale 30% Off</h1>
-                        <button style={{
-                            padding: '10px',
-                            border: 'none',
-                            width: '40%'
-                        }}>SHOP NOW</button>
-                    </div>
-                </div>
-
-            </FilterOptions>
-
+            <Filter />
             <ProductContainer>
-                <div style={{
-                    // border:'1px solid',
-                    textAlign: 'start'
-                }}>
-                    <select onChange={(e) => {
+                <AlignStart >
+                    <Select onChange={(e) => {
                         searchParams.set('sortby', e.target.value)
                         setSearchParams(searchParams)
                     }}
-                        style={{ padding: '10px', color: 'gray', border: 'none', outline: 'none', boxShadow: 'rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px' }} name="" id="">
+                        name="" id="">
                         <option value="">Select Here For Sort</option>
-                        {/* <option value="">Sort By Latest</option>
-                <option value="">Sort By Poplular</option> */}
                         <option value="asc">Sort By Price : Low To High</option>
                         <option value="desc">Sort By Price : High To Low</option>
-                    </select>
+                    </Select>
 
-                </div>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3,1fr)',
-                    width: '100%',
-                    border: '1px solid',
-                    gap: '30px 20px',
-                    marginTop: '20px'
-
-                }}>
+                </AlignStart>
+                <GridItems >
                     {data.map((elem, ind) => {
                         return (
-                            <div key={ind} style={{
-                                borderRadius: '5px',
-                                boxShadow: 'rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px'
-                            }}>
-                                <div style={{
-                                    height: "40vh",
-
-                                    backgroundColor: '#fafafa'
-                                }}>
-                                    <img style={{ width: '100%', height: '100%', objectFit: 'fill' }}
-
-
-                                        src={elem.img} alt="" />
-                                </div>
-                                <div style={{
-                                    textAlign: 'start',
-                                    display: 'grid',
-                                    gap: '5px',
-                                    padding: '10px '
-                                }}>
+                            <Card key={ind} >
+                                <CardItem >
+                                    <Image src={elem.img} alt="img" />
+                                </CardItem>
+                                <ContentBox >
                                     <h4>{elem.name}</h4>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center'
-                                    }}>
-                                        <s style={{
-                                            color: 'gray'
-
-                                        }}>${Math.floor(elem.mrp)}</s>&nbsp;&nbsp;&nbsp;
-                                        <strong style={{
-                                            color: 'red'
-                                        }}>${Math.floor(elem.price)}</strong>
-
-                                    </div>
+                                    <PriceDiv >
+                                        <S >${Math.floor(elem.mrp)}</S>&nbsp;&nbsp;&nbsp;
+                                        <Strong >${Math.floor(elem.price)}</Strong>
+                                    </PriceDiv>
                                     <Rating rating={elem.rating} />
                                     <Addtocart >Add To Cart</Addtocart>
-                                </div>
-                            </div>
+                                </ContentBox>
+                            </Card>
                         )
                     })}
 
-                </div>
+                </GridItems>
                 <div style={{
 
                     margin: "10% auto"
                 }}>
-                    <PageButtons onClick={() => (setPage((p) => p - 1))} >prev</PageButtons>&nbsp;&nbsp;
+                    <PageButtons disabled={page === 1} onClick={() => (setPage((p) => p - 1))} >prev</PageButtons>&nbsp;&nbsp;
                     <PageButtons>{page}</PageButtons>&nbsp;&nbsp;
-                    <PageButtons onClick={() => (setPage((p) => p + 1))}>next</PageButtons>
+                    <PageButtons disabled={data.length < 6} onClick={() => (setPage((p) => p + 1))}>next</PageButtons>
                 </div>
             </ProductContainer>
 
         </Container>
     )
 }
-const Rating = ({ rating }) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-        if (i <= rating) {
-            stars.push(
-                <span key={i} role="img" aria-label="Star">
-                    <i style={{ color: '#f6bc3e' }} class="fa-solid fa-star"></i>
-                </span>
-            );
-        } else {
-            stars.push(
-                <span key={i} role="img" aria-label="Star">
-                    <i style={{ color: 'gray' }} class="fa-solid fa-star"></i>
-                </span>
-            );
-        }
-    }
 
-    return <div>{stars}</div>;
-};
+
+const Select = styled.select`
+ padding: 10px;
+  color: gray;
+   border: none;
+    outline: none; 
+    box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+`
+
+const Image = styled.img`
+ width: 100%;
+ height: 100%;
+  object-fit: contain 
+`
+const PriceDiv = styled.div`
+
+    display: flex;
+    align-items: center
+
+`
+const S = styled.s`
+    color: gray;
+`
+const Strong = styled.strong`
+    color: red;
+`
+const Card = styled.div`
+  
+    border-radius: 5px;
+    box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+
+`
+const ContentBox = styled.div`
+
+    text-align: start;
+    display: grid;
+    gap: 5px;
+    padding: 10px 
+
+`
+const AlignStart = styled.div`
+
+    text-align: start
+
+`
+
+const CardItem = styled.div`
+
+    height: 40vh;
+    background-color: #fafafa
+
+`
+
+
+const GridItems = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px 20px;
+  margin-top: 20px;
+
+  @media (max-width: 767px) {
+    grid-template-columns: repeat(1, 1fr); 
+
+  }
+
+  @media (min-width: 768px) and ( max-width :1023px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+
+ 
+`;
 
 
 const ProductContainer = styled.div`
   width:75%;
+  @media (max-width:767px){
+    width:100%
+}
+@media (min-width:768px) and  (max-width:1023px){ 
+    width:80%
+}
+
   `
 const Addtocart = styled.button`
 
@@ -231,6 +188,7 @@ const Addtocart = styled.button`
     border-radius:5px
 
 `
+
 
 const PageButtons = styled.button`
   padding:10px;
@@ -245,28 +203,17 @@ const PageButtons = styled.button`
 const Container = styled.div`
     display: flex;
     width:80%;
+    justify-content:space-between;
     margin:5% auto ;
-    ;
-    gap:20px
+    gap:20px;
+
+
+    @media (max-width:767px){
+        width:100%
+    }
+    @media (min-width:768px) and  (max-width:1023px){ 
+        width:100%
+    }
+
   
-`
-const FilterOptions = styled.div`
-    ;
-    width:25%;
-    text-align:start;
-  
-`
-const OptionDiv = styled.div`
-
-    display:grid;
-    color:gray;
-    text-align:start;
-    padding:10px 20px
-
-`
-
-const Heading = styled.div`
-    padding: 10px;
-    background-color: #E9EAEA
-
 `
