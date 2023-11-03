@@ -7,7 +7,9 @@ This is a sample React application with filtering, sorting, and pagination featu
 ## Getting Started
 
 Follow the steps below to get this React app up and running.
-## npm run start
+1. Open the root file in the terminal.
+2.  npm run start
+
 
 ## Features
 
