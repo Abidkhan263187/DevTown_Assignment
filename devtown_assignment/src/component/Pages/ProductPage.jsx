@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import styled, {css} from 'styled-components'
+import styled, { css } from 'styled-components'
 import axios from 'axios'
 import { useSearchParams } from "react-router-dom";
 import { Rating } from './Rating';
@@ -10,16 +10,16 @@ import { Filter } from './Filter';
 export const ProductPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [page, setPage] = useState(1);
-    // const [sort,setSort]=useState()
     const [data, setData] = useState([])
+    const [filter, setFilter] = useState(false)
 
 
     const cat = searchParams.get('category')
     const sort = searchParams.get('sortby')
     const size = searchParams.get('size')
     const rat = searchParams.get('rating')
-    // console.log(cat)
-    var url = `http://localhost:8080`
+
+    var url = process.env.REACT_APP_URL
     useEffect(() => {
         (async () => {
             let queryParams = [];
@@ -34,6 +34,7 @@ export const ProductPage = () => {
                 const response = await axios.get(url + queryString);
                 const { data } = response;
                 setData(data.data);
+                console.log(data.data)
             } catch (error) {
                 console.log(error)
             }
@@ -41,11 +42,16 @@ export const ProductPage = () => {
     }, [page, sort, cat, size, rat]);
 
 
-
+    const toggleFilter = () => {
+        setFilter(!filter)
+    }
+    const onClose = () => {
+        setFilter(false)
+    }
 
     return (
         <Container >
-            <Filter />
+            <Filter isOpen={filter} onClose={onClose} />
             <ProductContainer>
                 <AlignStart >
                     <Select onChange={(e) => {
@@ -57,10 +63,13 @@ export const ProductPage = () => {
                         <option value="asc">Sort By Price : Low To High</option>
                         <option value="desc">Sort By Price : High To Low</option>
                     </Select>
-
+                    <Button onClick={toggleFilter} >
+                        Filter
+                    </Button>
                 </AlignStart>
+
                 <GridItems >
-                    {data.map((elem, ind) => {
+                    {data.length >0 ? data.map((elem, ind) => {
                         return (
                             <Card key={ind} >
                                 <CardItem >
@@ -77,7 +86,7 @@ export const ProductPage = () => {
                                 </ContentBox>
                             </Card>
                         )
-                    })}
+                    }): <EmptyCard></EmptyCard>}
 
                 </GridItems>
                 <div style={{
@@ -101,6 +110,27 @@ const Select = styled.select`
    border: none;
     outline: none; 
     box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+`
+const EmptyCard=styled.div`
+height:250px;
+margin:auto;
+width:90%;
+background-repeat: no-repeat;
+background-image:url(https://www.shutterstock.com/image-vector/mechanism-crossed-eye-sign-no-260nw-2311832361.jpg);
+box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.05) 0px 8px 32px;
+`
+const Button = styled.button`
+display:none;
+ padding:10px 10px;
+ border:none;
+ background-color:#FF324D;
+ color:white;
+ font-weight:600;
+ border-radius:5px;
+
+ @media (max-width:767px){
+    display:block;
+ }
 `
 
 const Image = styled.img`
@@ -135,8 +165,15 @@ const ContentBox = styled.div`
 
 `
 const AlignStart = styled.div`
+ display:flex;
+ flex-wrap:wrap;
+ align-items: center;
 
-    text-align: start
+ justify-content:space-between;
+ text-align: start;
+ @media (max-width:767px){
+    padding:0px 10px;
+ }
 
 `
 
@@ -156,22 +193,18 @@ const GridItems = styled.div`
 
   @media (max-width: 767px) {
     grid-template-columns: repeat(1, 1fr); 
-
   }
-
   @media (min-width: 768px) and ( max-width :1023px) {
     grid-template-columns: repeat(2, 1fr);
   }
-
-
- 
 `;
 
 
 const ProductContainer = styled.div`
   width:75%;
   @media (max-width:767px){
-    width:100%
+    width:100%;
+    marginTop:-100%;   
 }
 @media (min-width:768px) and  (max-width:1023px){ 
     width:80%
@@ -206,10 +239,10 @@ const Container = styled.div`
     justify-content:space-between;
     margin:5% auto ;
     gap:20px;
-
-
+    
     @media (max-width:767px){
-        width:100%
+        width:100%;
+        display:block;
     }
     @media (min-width:768px) and  (max-width:1023px){ 
         width:100%

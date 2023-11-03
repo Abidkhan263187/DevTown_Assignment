@@ -4,17 +4,21 @@ import styled from 'styled-components'
 import { Rating } from './Rating';
 
 
-export const Filter = () => {
+export const Filter = ({isOpen,onClose} ) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const cat = searchParams.get('category')
     const size = searchParams.get('size')
     const rat = searchParams.get('rating')
+
+
     return (
         
-            <FilterOptions >
+            <FilterOptions className={isOpen ? 'isOpen' : ''}>
 
                 <div>
-                    <Heading > Filter By Categories</Heading>
+                
+                    <Heading > Filter By Categories  </Heading>
+                    <Close onClick={onClose} >X</Close>
                     <OptionDiv onChange={(e) => {
                         const { value } = e.target
                         searchParams.set('category', value === cat ? "" : value)
@@ -83,6 +87,22 @@ const ShopButton = styled.button`
     width: 40%
 
  `
+
+ const Close=styled.button`
+ 
+ display:none;
+ background-color:#FF324D;
+ color:white;
+ border:none;
+ font-weight:600;
+ @media (max-width:767px){
+    display:block;
+    position: absolute;
+    right: 0;
+    top:0;
+    padding:10px;
+ }
+ `
 const Banner = styled.div`
 
     background-image: url(https://klbtheme.com/shopwise/fashion/wp-content/uploads/2020/04/sidebar_banner_img-1.jpg);
@@ -97,16 +117,24 @@ const Content = styled.div`
 
 `
 const FilterOptions = styled.div`
-    width:25%;
-    text-align:start;
-    @media (max-width: 767px) {
-    display:none;
-    
-      }
-    
-   
-  
-`
+  width: 25%;
+  text-align: start;
+  transition: transform 0.3s ease-in-out;
+
+  @media (max-width: 767px) {
+    width: 100%;
+    overflow:hidden;
+    position:absolute;
+    margin-top:10%;
+    background-color:#50504F;
+    transform: translateX(-150%);
+
+    &.isOpen {
+      transform: translateX(0);
+    }
+  }
+`;
+
 const OptionDiv = styled.div`
 
     display:grid;
