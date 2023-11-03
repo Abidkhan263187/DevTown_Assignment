@@ -34,7 +34,7 @@ export const ProductPage = () => {
                 const response = await axios.get(url + queryString);
                 const { data } = response;
                 setData(data.data);
-                console.log(data.data)
+                // console.log(data.data)
             } catch (error) {
                 console.log(error)
             }
