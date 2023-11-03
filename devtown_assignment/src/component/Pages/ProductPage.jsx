@@ -12,6 +12,7 @@ export const ProductPage = () => {
     const [page, setPage] = useState(1);
     const [data, setData] = useState([])
     const [filter, setFilter] = useState(false)
+    const [loading,setLoading]=useState(true)
 
 
     const cat = searchParams.get('category')
@@ -34,6 +35,7 @@ export const ProductPage = () => {
                 const response = await axios.get(url + queryString);
                 const { data } = response;
                 setData(data.data);
+                setLoading(false)
                 // console.log(data.data)
             } catch (error) {
                 console.log(error)
@@ -68,27 +70,30 @@ export const ProductPage = () => {
                     </Button>
                 </AlignStart>
 
-                <GridItems >
-                    {data.length >0 ? data.map((elem, ind) => {
-                        return (
-                            <Card key={ind} >
-                                <CardItem >
-                                    <Image src={elem.img} alt="img" />
-                                </CardItem>
-                                <ContentBox >
-                                    <h4>{elem.name}</h4>
-                                    <PriceDiv >
-                                        <S >${Math.floor(elem.mrp)}</S>&nbsp;&nbsp;&nbsp;
-                                        <Strong >${Math.floor(elem.price)}</Strong>
-                                    </PriceDiv>
-                                    <Rating rating={elem.rating} />
-                                    <Addtocart >Add To Cart</Addtocart>
-                                </ContentBox>
-                            </Card>
-                        )
-                    }): <EmptyCard></EmptyCard>}
+                {!loading ? ( <GridItems >
+                   
+                   {data.length >0 ? data.map((elem, ind) => {
+                       return (
+                           <Card key={ind} >
+                               <CardItem >
+                                   <Image src={elem.img} alt="img" />
+                               </CardItem>
+                               <ContentBox >
+                                   <h4>{elem.name}</h4>
+                                   <PriceDiv >
+                                       <S >${Math.floor(elem.mrp)}</S>&nbsp;&nbsp;&nbsp;
+                                       <Strong >${Math.floor(elem.price)}</Strong>
+                                   </PriceDiv>
+                                   <Rating rating={elem.rating} />
+                                   <Addtocart >Add To Cart</Addtocart>
+                               </ContentBox>
+                           </Card>
+                       )
+                   }): <EmptyCard></EmptyCard>}
 
-                </GridItems>
+               </GridItems>) :( <h1>Loading...</h1>)}
+
+               
                 <div style={{
 
                     margin: "10% auto"

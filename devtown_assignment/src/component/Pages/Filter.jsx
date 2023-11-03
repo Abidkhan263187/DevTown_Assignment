@@ -108,7 +108,8 @@ const Banner = styled.div`
     background-image: url(https://klbtheme.com/shopwise/fashion/wp-content/uploads/2020/04/sidebar_banner_img-1.jpg);
     height: 350px;
     color: white;
-    marginTop: 30px
+    background-repeat:no-repeat;
+    margin:auto;
 `
 const Content = styled.div`
 
@@ -125,7 +126,7 @@ const FilterOptions = styled.div`
     width: 100%;
     overflow:hidden;
     position:absolute;
-    margin-top:10%;
+    margin-top:15%;
     background-color:#50504F;
     transform: translateX(-150%);
 
